@@ -1,3 +1,33 @@
+-- Quality Checks
+
+-- Check For Nulls or Duplicates in Primary Key
+-- Expectation: No Results
+select 
+prd_id,
+count(*)
+from silver.crm_prd_info
+group by prd_id
+having count(*) >1 or prd_id is null
+
+-- Check for unwanted Spaces 
+-- Expectation: No Results
+select prd_nm 
+from silver.crm_prd_info
+where prd_nm != trim(prd_nm)
+
+-- Check for NULLs or Negaive Numbers
+-- Expectation: No Results
+select prd_cost
+from silver.crm_prd_info
+where prd_cost < 0 or prd_cost is null
+
+-- Data Standardization & Consistency
+select distinct prd_line from silver.crm_prd_info
+
+-- Check for Invalid Date Orders
+select * from silver.crm_prd_info where prd_end_dt < prd_start_dt
+
+-- Load bronze to silver for crm_prd_info
 insert into silver.crm_prd_info (prd_id,cat_id, prd_key,  prd_nm, prd_cost, prd_line, prd_start_dt, prd_end_dt)
 select 
 prd_id,
